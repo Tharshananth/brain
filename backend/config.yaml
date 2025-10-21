@@ -1,0 +1,256 @@
+# BrainSightAI’s Chatbot Configuration
+# Multi-Model LLM Support
+
+app:
+  name: "BrainSightAI Chatbot"
+  version: "2.0.0"
+  environment: "production"  # development, staging, production
+  debug: false
+
+# LLM Provider Configuration
+llm:
+  # Default provider to use (openai, claude, gemini, huggingface)
+  default_provider: "openai"
+  
+  # Enable automatic fallback to next provider if primary fails
+  enable_fallback: true
+  
+  # Fallback order
+  fallback_order:
+   - "openai"
+   - "gemini"
+   - "huggingface"
+   - "claude"
+  
+  # Provider-specific configurations
+  providers:
+    openai:
+      enabled: true
+      model: "gpt-4-turbo-preview"
+      api_key_env: "OPENAI_API_KEY"
+      temperature: 0.4
+      max_tokens: 300
+      top_p: 0.9
+      frequency_penalty: 0.0
+      presence_penalty: 0.0
+      stream: true
+      timeout: 30
+      
+    claude:
+      enabled: true
+      model: "claude-3-5-sonnet-20241022"
+      api_key_env: "ANTHROPIC_API_KEY"
+      temperature: 0.4
+      max_tokens: 300
+      top_p: 0.9
+      stream: true
+      timeout: 30
+      
+    gemini:
+      enabled: true
+      model: "gemini-1.5-pro"
+      api_key_env: "GOOGLE_API_KEY"
+      temperature: 0.4
+      max_tokens: 300
+      top_p: 0.9
+      stream: true
+      timeout: 30
+      
+    huggingface:
+      enabled: true
+      model: "meta-llama/Llama-3.3-70B-Instruct-Turbo"
+      api_key_env: "HF_TOKEN"
+      temperature: 0.7
+      max_tokens: 1000
+      top_p: 0.9
+      stream: false
+      timeout: 30
+
+# Embedding Configuration
+embeddings:
+  provider: "huggingface"  # openai, huggingface
+  
+  providers:
+    openai:
+      model: "text-embedding-3-small"
+      api_key_env: "OPENAI_API_KEY"
+      dimensions: 1536
+      
+    huggingface:
+      model: "sentence-transformers/all-MiniLM-L6-v2"
+      api_key_env: "HF_TOKEN"
+      dimensions: 384
+
+# Vector Database Configuration
+vector_db:
+  type: "chroma"  # chroma, faiss, pinecone
+  persist_directory: "./chroma_db"
+  collection_name: "BrainSightAIs_knowledge"
+  
+  # Search parameters
+  search:
+    k: 4  # Number of documents to retrieve
+    score_threshold: 0.5  # Minimum relevance score
+    search_type: "similarity"  # similarity, mmr, similarity_score_threshold
+    
+  # Chunking parameters
+  chunking:
+    chunk_size: 1000
+    chunk_overlap: 200
+    separators: ["\n\n", "\n", ". ", " ", ""]
+
+# Document Processing
+documents:
+  # Supported file types
+  supported_formats:
+    - ".pdf"
+    - ".docx"
+    - ".txt"
+    - ".md"
+  
+  # Maximum file size (bytes)
+  max_file_size: 10485760  # 10MB
+  
+  # Data directory
+  data_dir: "./data"
+  upload_dir: "./uploads"
+
+# API Configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: false
+  
+  # CORS settings
+  cors:
+    enabled: true
+    allow_origins:
+      - "https://portfolio-pingus.vercel.app"
+      - "http://localhost:3000"
+      - "http://127.0.0.1:3000"
+    allow_credentials: true
+    allow_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allow_headers: ["*"]
+  
+  # Rate limiting
+  rate_limit:
+    enabled: true
+    requests_per_minute: 60
+    requests_per_hour: 1000
+  
+  # Request timeout
+  timeout: 60
+
+# Caching Configuration
+cache:
+  enabled: true
+  type: "memory"  # memory, redis
+  ttl: 3600  # Cache TTL in seconds
+  max_size: 1000  # Maximum cache entries
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  # Log files
+  file:
+    enabled: true
+    path: "./logs/app.log"
+    max_bytes: 10485760  # 10MB
+    backup_count: 5
+  
+  # Console logging
+  console:
+    enabled: true
+    colorize: true
+
+# Session Management
+session:
+  # Session timeout (seconds)
+  timeout: 86400  # 24 hours
+  
+  # Cleanup interval (seconds)
+  cleanup_interval: 3600  # 1 hour
+  
+  # Maximum sessions to keep
+  max_sessions: 10000
+
+# System Prompt
+system_prompt: |
+  You are VoxelBox Explore Assistant, the official technical support and research companion for BrainSightAI’s VoxelBox Explore platform.
+
+  Your role: Help users with neuroimaging workflows, MRI/fMRI/diffusion analyses, and using VoxelBox Explore effectively.
+  Your tone: Expert, confident, and engaging — explanations should feel natural, human, and insightful.
+
+  ---
+  🧩 Knowledge Scope
+  - Structural MRI (T1, T2, FLAIR, T1CE)
+  - Functional MRI (task-based, resting-state, preprocessing, stats)
+  - Diffusion MRI & tractography (CSD, FA, MD, RD, deterministic/probabilistic methods)
+  - Neuroinformatics, connectomics, quality control, and preprocessing workflows
+  - VoxelBox platform tools: case management, upload, processing, visualization
+
+  ---
+  🧭 Behavior Guidelines
+  - Be crisp and simple because the output is shown in the popup chatbot window.
+  - Be precise and straightforward to the user.
+  - Be crisp but rich. Write in short paragraphs or 2–4 sentences that sound natural, not robotic.
+  - Be catchy. Use approachable phrasing like “Here’s how you can do it” or “Think of this as...”
+  - Be visual. When helpful, describe outcomes simply (e.g., “You’ll see a 3D brain map highlighting…”).
+  - For how-to questions → give step-by-step steps (3–6 steps).
+  - For conceptual questions → give 1–2 short, well-phrased paragraphs.
+  - Always ground in {{retrieved_context}} if provided.
+  - If not in context → “I don’t have enough information from the data to answer that confidently.”
+  - For medical topics → end with: “Not medical advice — consult your clinician.”
+
+  ---
+  🗂️ Example Behaviors
+  - Q: How do I upload my MRI scan?
+    A: Sure! Uploading your scan takes just a few steps:
+      1. Log into VoxelBox Explore and open Upload → New Case.
+      2. Select your DICOM or NIfTI file.
+      3. Add metadata (patient ID, scan type).
+      4. Click Confirm Upload and track progress in My Cases.
+      That’s it — your scan will start processing automatically.
+
+  - Q: What’s the difference between MRI and fMRI?
+    A: MRI captures the brain’s structure — the shape and tissue details.
+    fMRI maps function by tracking blood-oxygen changes while you rest or perform a task.
+    Together, they give structure and activity — like anatomy plus motion.
+
+  - Q: When will I get my report?
+    A: Most reports are ready within 24–72 hours after upload, depending on data size and queue.
+    You’ll get a notification once it’s available in your dashboard.
+
+  - Q: Tell me about VoxelBox.
+    A: VoxelBox Explore transforms MRI and fMRI data into detailed brain connectivity maps using AI-driven workflows.
+    It helps researchers and clinicians visualize networks, detect anomalies, and track neuro-functional patterns over time.
+    Think of it as your digital window into brain connectivity.
+
+  ---
+  🧾 Additional Rules
+  - Be crisp and simple because the output is shown in the popup chatbot window.
+
+  - Be clear but keep a natural flow (no rigid bullet overload unless steps are needed).
+  - Don’t hallucinate features or claims outside BrainSightAI’s domain.
+  - Always maintain professionalism and empathy.
+  - Respect privacy and compliance (no PHI exposure).
+  - Not medical advice — consult your clinician.
+
+  
+
+# Monitoring & Analytics
+monitoring:
+  enabled: true
+  
+  # Track metrics
+  track_usage: true
+  track_costs: true
+  track_performance: true
+  
+  # Alert thresholds
+  alerts:
+    error_rate_threshold: 0.05  # 5%
+    response_time_threshold: 5000  # 5 seconds
+    token_usage_threshold: 1000000  # 1M tokens per day
