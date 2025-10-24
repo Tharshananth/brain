@@ -53,11 +53,10 @@ st.markdown("""
         border-left: 4px solid #ffc107;
         margin-top: 0.5rem;
     }
-    .metric-card {
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        border: 1px solid #dee2e6;
+    .feedback-buttons {
+        margin-top: 0.5rem;
+        display: flex;
+        gap: 0.5rem;
     }
     .stButton>button {
         width: 100%;
@@ -74,6 +73,17 @@ if 'current_provider' not in st.session_state:
     st.session_state.current_provider = None
 if 'available_providers' not in st.session_state:
     st.session_state.available_providers = []
+if 'feedback_given' not in st.session_state:
+    st.session_state.feedback_given = {}
+if 'user_id' not in st.session_state:
+    # Generate unique user_id and store in session
+    import hashlib
+    import socket
+    # Create unique ID based on time and random factors
+    unique_string = f"{time.time()}_{socket.gethostname()}_{id(st.session_state)}"
+    st.session_state.user_id = hashlib.md5(unique_string.encode()).hexdigest()[:16]
+    logger_msg = f"New user: {st.session_state.user_id}"
+    # Note: In production, you might want to store this in a cookie for persistence
 
 # Helper Functions
 def check_server_health():
@@ -119,7 +129,7 @@ def send_message(message, provider=None):
             "message": message,
             "conversation_history": [
                 {"role": msg["role"], "content": msg["content"]}
-                for msg in st.session_state.messages[-10:]  # Last 10 messages
+                for msg in st.session_state.messages[-10:]
             ],
             "session_id": st.session_state.session_id,
             "provider": provider
@@ -136,6 +146,27 @@ def send_message(message, provider=None):
     except Exception as e:
         st.error(f"Error: {str(e)}")
     return None
+
+def submit_feedback(message_id, feedback_type, comment=None):
+    """Submit feedback for a message"""
+    try:
+        payload = {
+            "message_id": message_id,
+            "feedback_type": feedback_type,
+            "feedback_comment": comment
+        }
+        
+        response = requests.post(
+            f"{API_BASE_URL}/api/feedback/submit",
+            json=payload,
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            return True
+    except Exception as e:
+        st.error(f"Feedback error: {str(e)}")
+    return False
 
 def stream_message(message, provider=None):
     """Stream message response"""
@@ -212,6 +243,7 @@ def clear_chat():
     """Clear chat history"""
     st.session_state.messages = []
     st.session_state.session_id = f"session_{int(time.time())}"
+    st.session_state.feedback_given = {}
 
 # Sidebar
 with st.sidebar:
@@ -297,6 +329,7 @@ with tab1:
         for idx, message in enumerate(st.session_state.messages):
             role = message["role"]
             content = message["content"]
+            message_id = message.get("message_id")
             
             if role == "user":
                 st.markdown(f"""
@@ -312,6 +345,59 @@ with tab1:
                     <div class="message-content">{content}</div>
                 </div>
                 """, unsafe_allow_html=True)
+                
+                # Feedback buttons
+                if message_id and message_id not in st.session_state.feedback_given:
+                    col1, col2, col3 = st.columns([1, 1, 4])
+                    
+                    with col1:
+                        if st.button("👍", key=f"thumbs_up_{message_id}"):
+                            if submit_feedback(message_id, "thumbs_up"):
+                                st.session_state.feedback_given[message_id] = "thumbs_up"
+                                st.success("Thanks for your feedback!")
+                                st.rerun()
+                    
+                    with col2:
+                        if st.button("👎", key=f"thumbs_down_{message_id}"):
+                            if submit_feedback(message_id, "thumbs_down"):
+                                st.session_state.feedback_given[message_id] = "thumbs_down"
+                                st.success("Thanks for your feedback!")
+                                st.rerun()
+                    
+                    with col3:
+                        if st.button("💬 Comment", key=f"comment_{message_id}"):
+                            st.session_state[f"show_comment_{message_id}"] = True
+                    
+                    # Show comment box if requested
+                    if st.session_state.get(f"show_comment_{message_id}", False):
+                        with st.form(key=f"comment_form_{message_id}"):
+                            comment = st.text_area("Your feedback:", key=f"comment_text_{message_id}")
+                            feedback_type = st.radio(
+                                "Was this helpful?",
+                                ["thumbs_up", "thumbs_down"],
+                                key=f"comment_type_{message_id}"
+                            )
+                            
+                            col_submit, col_cancel = st.columns(2)
+                            with col_submit:
+                                submit = st.form_submit_button("Submit")
+                            with col_cancel:
+                                cancel = st.form_submit_button("Cancel")
+                            
+                            if submit and comment.strip():
+                                if submit_feedback(message_id, feedback_type, comment):
+                                    st.session_state.feedback_given[message_id] = feedback_type
+                                    st.session_state[f"show_comment_{message_id}"] = False
+                                    st.success("Thanks for your detailed feedback!")
+                                    st.rerun()
+                            elif cancel:
+                                st.session_state[f"show_comment_{message_id}"] = False
+                                st.rerun()
+                
+                elif message_id and message_id in st.session_state.feedback_given:
+                    feedback_type = st.session_state.feedback_given[message_id]
+                    icon = "👍" if feedback_type == "thumbs_up" else "👎"
+                    st.caption(f"{icon} Feedback submitted")
                 
                 # Show sources if available
                 if "sources" in message and message["sources"]:
@@ -349,12 +435,12 @@ with tab1:
             )
         
         with col2:
-            use_streaming = st.checkbox("Stream", value=True)
+            use_streaming = st.checkbox("Stream", value=False)
         
         submit_button = st.form_submit_button("📤 Send", use_container_width=True, type="primary")
     
     if submit_button and user_input:
-        if user_input.strip():  # Only process non-empty messages
+        if user_input.strip():
             # Add user message
             st.session_state.messages.append({
                 "role": "user",
@@ -363,7 +449,7 @@ with tab1:
             
             # Get response
             if use_streaming:
-                # Streaming response
+                # Streaming response - Note: streaming doesn't return message_id
                 with st.spinner("Thinking..."):
                     response_placeholder = st.empty()
                     full_response = ""
@@ -379,8 +465,9 @@ with tab1:
                         "content": full_response,
                         "provider": st.session_state.current_provider or "unknown"
                     })
+                    st.warning("⚠️ Feedback not available for streaming responses")
             else:
-                # Standard response
+                # Standard response with feedback support
                 with st.spinner("Getting response..."):
                     result = send_message(user_input, st.session_state.current_provider)
                     
@@ -390,7 +477,8 @@ with tab1:
                             "content": result["response"],
                             "sources": result.get("sources", []),
                             "provider": result.get("provider_used", "unknown"),
-                            "tokens": result.get("tokens_used")
+                            "tokens": result.get("tokens_used"),
+                            "message_id": result.get("message_id")  # Store message_id for feedback
                         })
             
             st.rerun()

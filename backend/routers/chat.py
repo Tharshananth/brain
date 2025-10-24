@@ -1,11 +1,11 @@
 """
-Chat API endpoints
-Handles chat conversations with RAG system
+Chat API endpoints - UPDATED with feedback storage
 """
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import List, Optional, AsyncIterator
+from sqlalchemy.orm import Session
 import uuid
 from datetime import datetime
 import logging
@@ -15,6 +15,7 @@ from llm.base import Message, LLMResponse
 from vector_db.retriever import DocumentRetriever
 from utils.validators import ChatMessageValidator
 from config import get_config
+from database import get_db, FeedbackInteraction
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/chat", tags=["Chat"])
@@ -30,7 +31,8 @@ class ChatRequest(BaseModel):
     message: str
     conversation_history: Optional[List[ChatMessage]] = []
     session_id: Optional[str] = None
-    provider: Optional[str] = None  # Allow provider selection
+    provider: Optional[str] = None
+    user_id: Optional[str] = None  # NEW: User identification
 
 class Source(BaseModel):
     title: str
@@ -44,18 +46,16 @@ class ChatResponse(BaseModel):
     success: bool
     provider_used: str
     tokens_used: Optional[int] = None
+    message_id: str  # NEW: Return message_id for feedback
 
 @router.post("/", response_model=ChatResponse)
-async def chat(request: ChatRequest, background_tasks: BackgroundTasks):
+async def chat(
+    request: ChatRequest, 
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
     """
     Send a message and get a response with RAG
-    
-    Args:
-        request: Chat request with message and history
-        background_tasks: FastAPI background tasks
-        
-    Returns:
-        ChatResponse with answer and sources
     """
     try:
         # Validate input
@@ -68,6 +68,7 @@ async def chat(request: ChatRequest, background_tasks: BackgroundTasks):
         
         # Get or create session ID
         session_id = request.session_id or f"session_{uuid.uuid4().hex[:12]}"
+        user_id = request.user_id or "anonymous"  # NEW: Get user_id or default
         
         # Initialize session if needed
         if session_id not in conversations:
@@ -89,7 +90,7 @@ async def chat(request: ChatRequest, background_tasks: BackgroundTasks):
         
         # Add conversation history
         if request.conversation_history:
-            for msg in request.conversation_history[-6:]:  # Last 6 messages
+            for msg in request.conversation_history[-6:]:
                 messages.append(Message(role=msg.role, content=msg.content))
         
         # Add current query with context
@@ -114,16 +115,36 @@ Answer:"""
             preferred_provider=request.provider
         )
         
+        # Generate unique message ID
+        message_id = f"msg_{uuid.uuid4().hex[:12]}"
+        
+        # Store interaction in database
+        try:
+            interaction = FeedbackInteraction(
+                session_id=session_id,
+                message_id=message_id,
+                question=request.message,
+                response=llm_response.content,
+                provider_used=llm_response.provider,
+                tokens_used=llm_response.tokens_used
+            )
+            db.add(interaction)
+            db.commit()
+            logger.info(f"Stored interaction: {message_id}")
+        except Exception as e:
+            logger.error(f"Failed to store interaction: {e}")
+            db.rollback()
+        
         # Store in conversation history
         conversations[session_id]["history"].extend([
             {
-                "id": f"msg_{uuid.uuid4().hex[:8]}",
+                "id": f"user_{uuid.uuid4().hex[:8]}",
                 "role": "user",
                 "content": request.message,
                 "timestamp": datetime.now().isoformat()
             },
             {
-                "id": f"msg_{uuid.uuid4().hex[:8]}",
+                "id": message_id,
                 "role": "assistant",
                 "content": llm_response.content,
                 "timestamp": datetime.now().isoformat(),
@@ -141,7 +162,8 @@ Answer:"""
             session_id=session_id,
             success=llm_response.finish_reason != "error",
             provider_used=llm_response.provider,
-            tokens_used=llm_response.tokens_used
+            tokens_used=llm_response.tokens_used,
+            message_id=message_id  # NEW: Include message_id
         )
         
     except Exception as e:
@@ -150,15 +172,7 @@ Answer:"""
 
 @router.post("/stream")
 async def chat_stream(request: ChatRequest):
-    """
-    Stream chat responses for real-time interaction
-    
-    Args:
-        request: Chat request
-        
-    Returns:
-        Streaming response
-    """
+    """Stream chat responses for real-time interaction"""
     try:
         validator = ChatMessageValidator(
             message=request.message,
@@ -211,15 +225,7 @@ Answer:"""
 
 @router.get("/history/{session_id}")
 async def get_history(session_id: str):
-    """
-    Get conversation history for a session
-    
-    Args:
-        session_id: Session identifier
-        
-    Returns:
-        Conversation history
-    """
+    """Get conversation history for a session"""
     if session_id not in conversations:
         raise HTTPException(status_code=404, detail="Session not found")
     
@@ -227,47 +233,12 @@ async def get_history(session_id: str):
 
 @router.delete("/history/{session_id}")
 async def delete_history(session_id: str):
-    """
-    Delete conversation history
-    
-    Args:
-        session_id: Session identifier
-        
-    Returns:
-        Success message
-    """
+    """Delete conversation history"""
     if session_id in conversations:
         del conversations[session_id]
         return {"message": "History deleted successfully"}
     else:
         raise HTTPException(status_code=404, detail="Session not found")
-
-@router.post("/feedback")
-async def submit_feedback(
-    session_id: str,
-    message_id: str,
-    helpful: bool,
-    feedback: Optional[str] = None
-):
-    """
-    Submit feedback for a response
-    
-    Args:
-        session_id: Session identifier
-        message_id: Message identifier
-        helpful: Whether response was helpful
-        feedback: Optional feedback text
-        
-    Returns:
-        Success message
-    """
-    try:
-        logger.info(f"Feedback: session={session_id}, helpful={helpful}")
-        # Store feedback (implement database storage in production)
-        return {"message": "Feedback received"}
-    except Exception as e:
-        logger.error(f"Feedback error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
 
 def cleanup_old_sessions():
     """Background task to cleanup old sessions"""
@@ -277,7 +248,7 @@ def cleanup_old_sessions():
         
         for session_id, data in conversations.items():
             created_at = datetime.fromisoformat(data["created_at"])
-            if (current_time - created_at).total_seconds() > 86400:  # 24 hours
+            if (current_time - created_at).total_seconds() > 86400:
                 expired.append(session_id)
         
         for session_id in expired:

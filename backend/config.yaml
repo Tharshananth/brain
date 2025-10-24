@@ -48,7 +48,7 @@ llm:
       
     gemini:
       enabled: true
-      model: "gemini-1.5-pro"
+      model: "gemini-2.5-flash"
       api_key_env: "GOOGLE_API_KEY"
       temperature: 0.4
       max_tokens: 300

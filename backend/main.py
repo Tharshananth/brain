@@ -23,9 +23,10 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from config import get_config, get_api_config
 from utils.logger import setup_logger
-from routers import chat_router, documents_router, health_router, config_router
+from routers import chat_router, documents_router, health_router, config_router, feedback_router
 from vector_db.retriever import DocumentRetriever
 from utils.document_loader import DocumentLoader
+from database import init_db  # NEW: Import database initialization
 
 # Setup logging
 logger = setup_logger("pingus")
@@ -47,6 +48,13 @@ async def lifespan(app: FastAPI):
     logger.info(f"Starting {config.app.name} v{config.app.version}")
     logger.info(f"Environment: {config.app.environment}")
     logger.info("=" * 60)
+    
+    # Initialize database - NEW
+    try:
+        init_db()
+        logger.info("✅ Database initialized")
+    except Exception as e:
+        logger.error(f"❌ Database initialization failed: {e}")
     
     try:
         # Initialize vector store with existing documents
@@ -92,14 +100,14 @@ app = FastAPI(
     description="AI-powered chatbot with RAG capabilities",
     version="2.0.0",
     docs_url=None,  # Disable default docs URL
-    redoc_url=None  # Disable default redoc URL
+    redoc_url=None,  # Disable default redoc URL
+    lifespan=lifespan  # Add lifespan handler
 )
 
 # Add rate limiting
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# Add CORS middleware
 # Add CORS middleware
 if api_config.cors.enabled:
     app.add_middleware(
@@ -128,6 +136,7 @@ app.include_router(chat_router)
 app.include_router(documents_router)
 app.include_router(health_router)
 app.include_router(config_router)
+app.include_router(feedback_router)  # NEW: Feedback router
 
 # Root endpoint
 @app.get("/", include_in_schema=False)
@@ -137,7 +146,7 @@ async def root():
         "name": config.app.name,
         "version": config.app.version,
         "status": "operational",
-        "docs": "/docs"  # Changed from "/api/docs" to "/docs"
+        "docs": "/docs"
     }
 
 # Health check (duplicate for convenience)
@@ -163,6 +172,7 @@ async def redoc_html():
         openapi_url="/openapi.json",
         title="PingUs API Documentation",
     )
+
 @app.get("/openapi.json", include_in_schema=False)
 async def get_openapi_json():
     return get_openapi(
