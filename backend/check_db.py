@@ -1,196 +1,133 @@
 """
-Direct Chat Endpoint Test
-Tests the chat endpoint directly to verify it saves to database
+Test script to verify database saves are working for REAL messages
+Run this to simulate a real frontend request
 """
 import requests
 import json
 import time
-from pathlib import Path
+import hashlib
 
-API_URL = "http://localhost:8000/api/chat/"
+# Configuration
+API_BASE_URL = "http://localhost:8000"
 
-def test_chat_endpoint():
-    """Test the chat endpoint directly"""
+def generate_user_id():
+    """Generate a unique user ID like the frontend does"""
+    unique_string = f"{time.time()}_{hash(str(time.time()))}"
+    return hashlib.md5(unique_string.encode()).hexdigest()[:16]
+
+def test_real_chat_message():
+    """Test sending a real chat message like the frontend does"""
     
-    print("\n" + "=" * 70)
-    print("TESTING CHAT ENDPOINT DIRECTLY")
-    print("=" * 70 + "\n")
+    print("\n" + "=" * 80)
+    print("TESTING REAL CHAT MESSAGE SAVE")
+    print("=" * 80)
     
-    # Create test payload
+    # Generate IDs like frontend does
+    user_id = generate_user_id()
+    session_id = f"session_{int(time.time())}"
+    
+    print(f"\n[TEST] Generated user_id: {user_id}")
+    print(f"[TEST] Generated session_id: {session_id}")
+    
+    # Prepare payload exactly like frontend sends it
     payload = {
-        "message": "What is VoxelBox?",
+        "message": "What is VoxelBox Explore? This is a real test from frontend simulation.",
         "conversation_history": [],
-        "session_id": f"test_session_{int(time.time())}",
-        "provider": None,
-        "user_id": f"test_user_{int(time.time())}"
+        "session_id": session_id,
+        "provider": None,  # Use default provider
+        "user_id": user_id  # This is the critical field!
     }
     
-    print("📤 Sending request to backend...")
-    print(f"   URL: {API_URL}")
-    print(f"   Message: {payload['message']}")
-    print(f"   User ID: {payload['user_id']}")
-    print(f"   Session ID: {payload['session_id']}")
+    print(f"\n[TEST] Sending request to {API_BASE_URL}/api/chat/")
+    print(f"[TEST] Payload: {json.dumps(payload, indent=2)}")
     
     try:
         # Send request
+        print("\n[TEST] Sending POST request...")
         response = requests.post(
-            API_URL,
+            f"{API_BASE_URL}/api/chat/",
             json=payload,
             timeout=120
         )
         
-        print(f"\n📥 Response received:")
-        print(f"   Status Code: {response.status_code}")
+        print(f"\n[TEST] Response status: {response.status_code}")
         
         if response.status_code == 200:
-            data = response.json()
-            print(f"   ✅ Success!")
-            print(f"\n📋 Response data:")
-            print(f"   Message ID: {data.get('message_id', 'N/A')}")
-            print(f"   Provider: {data.get('provider_used', 'N/A')}")
-            print(f"   Session ID: {data.get('session_id', 'N/A')}")
-            print(f"   Response length: {len(data.get('response', ''))} chars")
-            print(f"\n💬 Response preview:")
-            print(f"   {data.get('response', '')[:200]}...")
+            result = response.json()
+            print(f"[TEST] ✅ Chat request successful!")
+            print(f"[TEST] Message ID: {result.get('message_id')}")
+            print(f"[TEST] Provider used: {result.get('provider_used')}")
+            print(f"[TEST] Response length: {len(result.get('response', ''))} chars")
             
-            # Now verify in database
-            print(f"\n🔍 Verifying in database...")
-            verify_in_database(data.get('message_id'))
+            message_id = result.get('message_id')
+            
+            # Wait a moment for DB to fully commit
+            print("\n[TEST] Waiting 2 seconds for DB commit...")
+            time.sleep(2)
+            
+            # Now verify it's in the database
+            print("\n[TEST] Verifying database save...")
+            print(f"[TEST] Run this command to check:")
+            print(f"       python test_db.py")
+            print(f"\n[TEST] Or check for message_id: {message_id}")
             
             return True
-        else:
-            print(f"   ❌ Error!")
-            print(f"   Response: {response.text}")
-            return False
             
-    except requests.exceptions.ConnectionError:
-        print(f"\n❌ Cannot connect to backend!")
-        print(f"   Make sure backend is running: cd backend && python main.py")
-        return False
-    except Exception as e:
-        print(f"\n❌ Error: {e}")
-        return False
-
-
-def verify_in_database(message_id):
-    """Verify the message was saved in database"""
-    
-    import sqlite3
-    from pathlib import Path
-    
-    DB_PATH = Path("data/database/feedback.db")
-    
-    if not DB_PATH.exists():
-        print(f"   ❌ Database file not found!")
-        return False
-    
-    try:
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        
-        cursor.execute("""
-            SELECT 
-                user_id, 
-                session_id, 
-                question, 
-                response, 
-                provider_used
-            FROM feedback_interactions
-            WHERE message_id = ?
-        """, (message_id,))
-        
-        row = cursor.fetchone()
-        conn.close()
-        
-        if row:
-            print(f"   ✅✅✅ MESSAGE FOUND IN DATABASE!")
-            user_id, session_id, question, response, provider = row
-            print(f"\n   📊 Database record:")
-            print(f"      User ID: {user_id}")
-            print(f"      Session ID: {session_id}")
-            print(f"      Question: {question[:50]}...")
-            print(f"      Response: {response[:50]}...")
-            print(f"      Provider: {provider}")
-            return True
         else:
-            print(f"   ❌❌❌ MESSAGE NOT FOUND IN DATABASE!")
-            print(f"   This means the save code isn't working")
+            print(f"[TEST] ❌ Request failed with status {response.status_code}")
+            print(f"[TEST] Response: {response.text}")
             return False
             
     except Exception as e:
-        print(f"   ❌ Error checking database: {e}")
+        print(f"\n[TEST] ❌ Error: {e}")
+        import traceback
+        print(traceback.format_exc())
         return False
 
-
-def count_total_records():
-    """Count all records in database"""
-    
-    import sqlite3
-    from pathlib import Path
-    
-    DB_PATH = Path("data/database/feedback.db")
-    
-    print(f"\n📊 Database stats:")
-    
+def check_backend_health():
+    """Check if backend is running"""
     try:
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        
-        # Total count
-        cursor.execute("SELECT COUNT(*) FROM feedback_interactions")
-        total = cursor.fetchone()[0]
-        
-        # Test vs real
-        cursor.execute("""
-            SELECT COUNT(*) FROM feedback_interactions 
-            WHERE user_id LIKE '%test%'
-        """)
-        test_count = cursor.fetchone()[0]
-        
-        real_count = total - test_count
-        
-        print(f"   Total records: {total}")
-        print(f"   Test records: {test_count}")
-        print(f"   Real messages: {real_count}")
-        
-        conn.close()
-        
-    except Exception as e:
-        print(f"   Error: {e}")
+        response = requests.get(f"{API_BASE_URL}/health", timeout=5)
+        return response.status_code == 200
+    except:
+        return False
 
+def main():
+    print("\n" + "=" * 80)
+    print("REAL MESSAGE DATABASE SAVE TEST")
+    print("=" * 80)
+    
+    # Check backend
+    print("\n[CHECK] Checking if backend is running...")
+    if not check_backend_health():
+        print("[CHECK] ❌ Backend is not running!")
+        print("[CHECK] Start backend with: cd backend && python main.py")
+        return
+    
+    print("[CHECK] ✅ Backend is running")
+    
+    # Test real message
+    success = test_real_chat_message()
+    
+    # Final instructions
+    print("\n" + "=" * 80)
+    if success:
+        print("TEST COMPLETED SUCCESSFULLY!")
+        print("=" * 80)
+        print("\n📋 Next steps:")
+        print("   1. Run: python test_db.py")
+        print("   2. Look for 'REAL' messages in the output")
+        print("   3. Check section '5. RECENT REAL CHAT MESSAGES'")
+        print("\nIf you see your test message, the database save is working! ✅")
+    else:
+        print("TEST FAILED!")
+        print("=" * 80)
+        print("\n🔧 Troubleshooting:")
+        print("   1. Check backend logs for errors")
+        print("   2. Make sure chat.py is using the fixed version")
+        print("   3. Restart the backend server")
+    
+    print("\n" + "=" * 80 + "\n")
 
 if __name__ == "__main__":
-    print("\n🧪 This script tests the chat endpoint directly")
-    print("   It bypasses the Streamlit frontend")
-    print("   If this works, the problem is in the frontend")
-    print("   If this fails, the problem is in the backend\n")
-    
-    input("Press Enter to start the test...")
-    
-    success = test_chat_endpoint()
-    
-    print("\n" + "=" * 70)
-    
-    if success:
-        print("✅ ENDPOINT TEST PASSED!")
-        print("\nIf the database verification also passed:")
-        print("   → Backend is working correctly")
-        print("   → Problem is in the Streamlit frontend")
-        print("   → Check frontend code for user_id passing")
-        print("\nIf the database verification failed:")
-        print("   → Backend endpoint works but save code fails")
-        print("   → Check backend logs for database errors")
-    else:
-        print("❌ ENDPOINT TEST FAILED!")
-        print("\nPossible issues:")
-        print("   1. Backend not running")
-        print("   2. Backend crashed")
-        print("   3. API endpoint error")
-        print("\nCheck backend logs for errors")
-    
-    print("=" * 70)
-    
-    count_total_records()
-    
-    print("\n")
-    
+    main()

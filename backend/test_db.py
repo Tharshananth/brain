@@ -8,7 +8,7 @@ from pathlib import Path
 from datetime import datetime
 import sys
 
-DB_PATH = Path("data/database/feedback.db")
+DB_PATH = Path("C:\\Users\\tharshananth N\\brainsightAI\\data\\database\\feedback.db")
 
 def print_header(text):
     """Print formatted header"""
@@ -510,4 +510,3 @@ def main():
 if __name__ == "__main__":
     main()
 
-    

@@ -3782,3 +3782,390 @@
 2025-10-25 12:01:32,957 - pingus - INFO - Response: 200
 2025-10-25 12:01:34,988 - pingus - INFO - GET /api/config/
 2025-10-25 12:01:34,991 - pingus - INFO - Response: 200
+2025-10-25 14:12:26,515 - pingus - INFO - GET /health
+2025-10-25 14:12:26,602 - pingus - INFO - Response: 200
+2025-10-25 14:12:28,671 - pingus - INFO - GET /api/config/
+2025-10-25 14:12:28,700 - pingus - INFO - Response: 200
+2025-10-25 14:12:30,746 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:12:30,762 - pingus - INFO - Response: 200
+2025-10-25 14:12:32,848 - pingus - INFO - POST /api/config/provider/gemini
+2025-10-25 14:12:32,862 - pingus - INFO - Response: 200
+2025-10-25 14:12:35,072 - pingus - INFO - GET /health
+2025-10-25 14:12:35,079 - pingus - INFO - Response: 200
+2025-10-25 14:12:37,117 - pingus - INFO - GET /api/config/
+2025-10-25 14:12:37,135 - pingus - INFO - Response: 200
+2025-10-25 14:12:39,306 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:12:39,312 - pingus - INFO - Response: 200
+2025-10-25 14:12:41,368 - pingus - INFO - GET /api/documents/
+2025-10-25 14:12:41,964 - pingus - INFO - Response: 200
+2025-10-25 14:12:44,039 - pingus - INFO - GET /api/documents/
+2025-10-25 14:12:44,098 - pingus - INFO - Response: 200
+2025-10-25 14:12:46,186 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:12:46,188 - pingus - INFO - Response: 200
+2025-10-25 14:12:48,254 - pingus - INFO - GET /api/config/
+2025-10-25 14:12:50,197 - pingus - INFO - Response: 200
+2025-10-25 14:19:04,230 - pingus - INFO - Shutting down application...
+2025-10-25 14:20:25,248 - pingus - INFO - CORS enabled for all origins
+2025-10-25 14:20:25,281 - pingus - INFO - ============================================================
+2025-10-25 14:20:25,282 - pingus - INFO - Starting BrainSightAI Chatbot v2.0.0
+2025-10-25 14:20:25,283 - pingus - INFO - Environment: production
+2025-10-25 14:20:25,284 - pingus - INFO - ============================================================
+2025-10-25 14:20:25,934 - pingus - INFO - Initializing vector store...
+2025-10-25 14:20:55,538 - pingus - INFO - Vector store ready with 55 documents
+2025-10-25 14:20:57,438 - pingus - INFO - Available LLM providers: openai, claude, gemini, huggingface
+2025-10-25 14:20:57,439 - pingus - INFO - Default provider: openai
+2025-10-25 14:20:57,439 - pingus - INFO - Startup complete!
+2025-10-25 14:20:57,439 - pingus - INFO - ============================================================
+2025-10-25 14:21:10,873 - pingus - INFO - CORS enabled for all origins
+2025-10-25 14:21:10,882 - pingus - INFO - ============================================================
+2025-10-25 14:21:10,882 - pingus - INFO - Starting BrainSightAI Chatbot v2.0.0
+2025-10-25 14:21:10,883 - pingus - INFO - Environment: production
+2025-10-25 14:21:10,883 - pingus - INFO - ============================================================
+2025-10-25 14:21:10,897 - pingus - INFO - Initializing vector store...
+2025-10-25 14:21:23,235 - pingus - INFO - Vector store ready with 55 documents
+2025-10-25 14:21:23,808 - pingus - INFO - Available LLM providers: openai, claude, gemini, huggingface
+2025-10-25 14:21:23,809 - pingus - INFO - Default provider: openai
+2025-10-25 14:21:23,809 - pingus - INFO - Startup complete!
+2025-10-25 14:21:23,809 - pingus - INFO - ============================================================
+2025-10-25 14:21:32,944 - pingus - INFO - GET /health
+2025-10-25 14:21:32,947 - pingus - INFO - Response: 200
+2025-10-25 14:21:34,989 - pingus - INFO - GET /api/config/
+2025-10-25 14:21:34,996 - pingus - INFO - Response: 200
+2025-10-25 14:21:37,032 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:21:37,054 - pingus - INFO - Response: 200
+2025-10-25 14:21:39,139 - pingus - INFO - POST /api/config/provider/openai
+2025-10-25 14:21:39,141 - pingus - INFO - Response: 200
+2025-10-25 14:21:41,269 - pingus - INFO - GET /health
+2025-10-25 14:21:41,271 - pingus - INFO - Response: 200
+2025-10-25 14:21:42,126 - pingus - INFO - GET /health
+2025-10-25 14:21:42,128 - pingus - INFO - Response: 200
+2025-10-25 14:21:44,181 - pingus - INFO - GET /api/config/
+2025-10-25 14:21:44,183 - pingus - INFO - Response: 200
+2025-10-25 14:21:46,214 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:21:46,217 - pingus - INFO - Response: 200
+2025-10-25 14:21:48,257 - pingus - INFO - POST /api/config/provider/gemini
+2025-10-25 14:21:48,260 - pingus - INFO - Response: 200
+2025-10-25 14:21:50,360 - pingus - INFO - GET /health
+2025-10-25 14:21:50,361 - pingus - INFO - Response: 200
+2025-10-25 14:21:52,424 - pingus - INFO - GET /api/config/
+2025-10-25 14:21:52,427 - pingus - INFO - Response: 200
+2025-10-25 14:21:54,464 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:21:54,466 - pingus - INFO - Response: 200
+2025-10-25 14:21:56,512 - pingus - INFO - GET /api/documents/
+2025-10-25 14:21:56,553 - pingus - INFO - Response: 200
+2025-10-25 14:21:58,601 - pingus - INFO - GET /api/documents/
+2025-10-25 14:21:58,689 - pingus - INFO - Response: 200
+2025-10-25 14:22:00,782 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:22:00,785 - pingus - INFO - Response: 200
+2025-10-25 14:22:02,841 - pingus - INFO - GET /api/config/
+2025-10-25 14:22:02,843 - pingus - INFO - Response: 200
+2025-10-25 14:22:31,275 - pingus - INFO - GET /health
+2025-10-25 14:22:31,289 - pingus - INFO - Response: 200
+2025-10-25 14:22:33,346 - pingus - INFO - GET /api/config/
+2025-10-25 14:22:33,350 - pingus - INFO - Response: 200
+2025-10-25 14:22:35,379 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:22:35,382 - pingus - INFO - Response: 200
+2025-10-25 14:22:37,426 - pingus - INFO - GET /api/documents/
+2025-10-25 14:22:37,472 - pingus - INFO - Response: 200
+2025-10-25 14:22:39,525 - pingus - INFO - POST /api/chat/
+2025-10-25 14:22:56,016 - pingus - INFO - Response: 200
+2025-10-25 14:22:58,107 - pingus - INFO - GET /health
+2025-10-25 14:22:58,108 - pingus - INFO - Response: 200
+2025-10-25 14:23:00,158 - pingus - INFO - GET /api/config/
+2025-10-25 14:23:00,159 - pingus - INFO - Response: 200
+2025-10-25 14:23:02,173 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:23:02,175 - pingus - INFO - Response: 200
+2025-10-25 14:23:04,231 - pingus - INFO - GET /api/documents/
+2025-10-25 14:23:04,293 - pingus - INFO - Response: 200
+2025-10-25 14:23:06,353 - pingus - INFO - GET /api/documents/
+2025-10-25 14:23:06,410 - pingus - INFO - Response: 200
+2025-10-25 14:23:08,483 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:23:08,484 - pingus - INFO - Response: 200
+2025-10-25 14:23:10,542 - pingus - INFO - GET /api/config/
+2025-10-25 14:23:10,544 - pingus - INFO - Response: 200
+2025-10-25 14:23:58,594 - pingus - INFO - GET /health
+2025-10-25 14:23:58,595 - pingus - INFO - Response: 200
+2025-10-25 14:24:00,638 - pingus - INFO - GET /api/config/
+2025-10-25 14:24:00,640 - pingus - INFO - Response: 200
+2025-10-25 14:24:02,705 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:24:02,707 - pingus - INFO - Response: 200
+2025-10-25 14:24:04,765 - pingus - INFO - GET /api/documents/
+2025-10-25 14:24:04,829 - pingus - INFO - Response: 200
+2025-10-25 14:24:06,911 - pingus - INFO - POST /api/feedback/submit
+2025-10-25 14:24:06,973 - pingus - INFO - Response: 200
+2025-10-25 14:24:09,048 - pingus - INFO - GET /health
+2025-10-25 14:24:09,050 - pingus - INFO - Response: 200
+2025-10-25 14:24:11,067 - pingus - INFO - GET /api/config/
+2025-10-25 14:24:11,068 - pingus - INFO - Response: 200
+2025-10-25 14:24:13,123 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:24:13,125 - pingus - INFO - Response: 200
+2025-10-25 14:24:15,189 - pingus - INFO - GET /api/documents/
+2025-10-25 14:24:15,253 - pingus - INFO - Response: 200
+2025-10-25 14:24:17,317 - pingus - INFO - GET /api/documents/
+2025-10-25 14:24:17,544 - pingus - INFO - Response: 200
+2025-10-25 14:24:19,627 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:24:19,630 - pingus - INFO - Response: 200
+2025-10-25 14:24:21,666 - pingus - INFO - GET /api/config/
+2025-10-25 14:24:21,667 - pingus - INFO - Response: 200
+2025-10-25 14:24:33,819 - pingus - INFO - GET /health
+2025-10-25 14:24:33,821 - pingus - INFO - Response: 200
+2025-10-25 14:24:35,878 - pingus - INFO - GET /api/config/
+2025-10-25 14:24:35,880 - pingus - INFO - Response: 200
+2025-10-25 14:24:37,936 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:24:37,938 - pingus - INFO - Response: 200
+2025-10-25 14:24:39,985 - pingus - INFO - GET /api/documents/
+2025-10-25 14:24:40,052 - pingus - INFO - Response: 200
+2025-10-25 14:24:42,101 - pingus - INFO - POST /api/chat/
+2025-10-25 14:24:47,465 - pingus - INFO - Response: 200
+2025-10-25 14:24:49,561 - pingus - INFO - GET /health
+2025-10-25 14:24:49,595 - pingus - INFO - Response: 200
+2025-10-25 14:24:51,670 - pingus - INFO - GET /api/config/
+2025-10-25 14:24:51,671 - pingus - INFO - Response: 200
+2025-10-25 14:24:53,708 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:24:53,710 - pingus - INFO - Response: 200
+2025-10-25 14:24:55,756 - pingus - INFO - GET /api/documents/
+2025-10-25 14:24:55,802 - pingus - INFO - Response: 200
+2025-10-25 14:24:57,862 - pingus - INFO - GET /api/documents/
+2025-10-25 14:24:57,899 - pingus - INFO - Response: 200
+2025-10-25 14:24:59,942 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:24:59,945 - pingus - INFO - Response: 200
+2025-10-25 14:25:01,426 - pingus - INFO - GET /health
+2025-10-25 14:25:01,428 - pingus - INFO - Response: 200
+2025-10-25 14:25:03,467 - pingus - INFO - GET /api/config/
+2025-10-25 14:25:03,469 - pingus - INFO - Response: 200
+2025-10-25 14:25:05,511 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:25:05,513 - pingus - INFO - Response: 200
+2025-10-25 14:25:07,545 - pingus - INFO - GET /api/documents/
+2025-10-25 14:25:07,581 - pingus - INFO - Response: 200
+2025-10-25 14:25:09,619 - pingus - INFO - GET /api/documents/
+2025-10-25 14:25:09,818 - pingus - INFO - Response: 200
+2025-10-25 14:25:11,907 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:25:11,910 - pingus - INFO - Response: 200
+2025-10-25 14:25:13,963 - pingus - INFO - GET /api/config/
+2025-10-25 14:25:13,964 - pingus - INFO - Response: 200
+2025-10-25 14:25:18,534 - pingus - INFO - GET /health
+2025-10-25 14:25:18,536 - pingus - INFO - Response: 200
+2025-10-25 14:25:20,577 - pingus - INFO - GET /api/config/
+2025-10-25 14:25:20,578 - pingus - INFO - Response: 200
+2025-10-25 14:25:22,638 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:25:22,641 - pingus - INFO - Response: 200
+2025-10-25 14:25:24,708 - pingus - INFO - GET /api/documents/
+2025-10-25 14:25:24,750 - pingus - INFO - Response: 200
+2025-10-25 14:25:26,836 - pingus - INFO - POST /api/feedback/submit
+2025-10-25 14:25:26,852 - pingus - INFO - Response: 200
+2025-10-25 14:25:28,918 - pingus - INFO - GET /health
+2025-10-25 14:25:28,919 - pingus - INFO - Response: 200
+2025-10-25 14:25:30,966 - pingus - INFO - GET /api/config/
+2025-10-25 14:25:30,972 - pingus - INFO - Response: 200
+2025-10-25 14:25:33,037 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:25:33,038 - pingus - INFO - Response: 200
+2025-10-25 14:25:35,088 - pingus - INFO - GET /api/documents/
+2025-10-25 14:25:35,130 - pingus - INFO - Response: 200
+2025-10-25 14:25:37,181 - pingus - INFO - GET /api/documents/
+2025-10-25 14:25:37,221 - pingus - INFO - Response: 200
+2025-10-25 14:25:39,270 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:25:39,272 - pingus - INFO - Response: 200
+2025-10-25 14:25:41,314 - pingus - INFO - GET /api/config/
+2025-10-25 14:25:41,334 - pingus - INFO - Response: 200
+2025-10-25 14:27:07,267 - pingus - INFO - GET /health
+2025-10-25 14:27:07,273 - pingus - INFO - Response: 200
+2025-10-25 14:27:09,313 - pingus - INFO - POST /api/chat/
+2025-10-25 14:27:16,325 - pingus - INFO - Response: 200
+2025-10-25 14:30:12,155 - pingus - INFO - Shutting down application...
+2025-10-25 14:30:31,011 - pingus - INFO - CORS enabled for all origins
+2025-10-25 14:30:31,029 - pingus - INFO - ============================================================
+2025-10-25 14:30:31,030 - pingus - INFO - Starting BrainSightAI Chatbot v2.0.0
+2025-10-25 14:30:31,030 - pingus - INFO - Environment: production
+2025-10-25 14:30:31,031 - pingus - INFO - ============================================================
+2025-10-25 14:30:31,065 - pingus - INFO - Initializing vector store...
+2025-10-25 14:30:46,248 - pingus - INFO - Vector store ready with 55 documents
+2025-10-25 14:30:46,983 - pingus - INFO - Available LLM providers: openai, claude, gemini, huggingface
+2025-10-25 14:30:46,983 - pingus - INFO - Default provider: openai
+2025-10-25 14:30:46,984 - pingus - INFO - Startup complete!
+2025-10-25 14:30:46,984 - pingus - INFO - ============================================================
+2025-10-25 14:33:11,307 - pingus - INFO - GET /health
+2025-10-25 14:33:11,314 - pingus - INFO - Response: 200
+2025-10-25 14:33:13,367 - pingus - INFO - POST /api/chat/
+2025-10-25 14:33:20,266 - pingus - INFO - Response: 200
+2025-10-25 14:34:42,631 - pingus - INFO - GET /health
+2025-10-25 14:34:42,649 - pingus - INFO - Response: 200
+2025-10-25 14:34:44,711 - pingus - INFO - POST /api/chat/
+2025-10-25 14:34:50,420 - pingus - INFO - Response: 200
+2025-10-25 14:36:30,330 - pingus - INFO - Shutting down application...
+2025-10-25 14:36:50,573 - pingus - INFO - CORS enabled for all origins
+2025-10-25 14:36:50,651 - pingus - INFO - ============================================================
+2025-10-25 14:36:50,653 - pingus - INFO - Starting BrainSightAI Chatbot v2.0.0
+2025-10-25 14:36:50,656 - pingus - INFO - Environment: production
+2025-10-25 14:36:50,659 - pingus - INFO - ============================================================
+2025-10-25 14:36:50,691 - pingus - INFO - Initializing vector store...
+2025-10-25 14:37:04,576 - pingus - INFO - Vector store ready with 55 documents
+2025-10-25 14:37:05,202 - pingus - INFO - Available LLM providers: openai, claude, gemini, huggingface
+2025-10-25 14:37:05,203 - pingus - INFO - Default provider: openai
+2025-10-25 14:37:05,203 - pingus - INFO - Startup complete!
+2025-10-25 14:37:05,204 - pingus - INFO - ============================================================
+2025-10-25 14:37:05,213 - pingus - INFO - GET /health
+2025-10-25 14:37:20,983 - pingus - INFO - CORS enabled for all origins
+2025-10-25 14:37:20,993 - pingus - INFO - ============================================================
+2025-10-25 14:37:20,994 - pingus - INFO - Starting BrainSightAI Chatbot v2.0.0
+2025-10-25 14:37:20,995 - pingus - INFO - Environment: production
+2025-10-25 14:37:20,995 - pingus - INFO - ============================================================
+2025-10-25 14:37:21,003 - pingus - INFO - Initializing vector store...
+2025-10-25 14:37:33,425 - pingus - INFO - Vector store ready with 55 documents
+2025-10-25 14:37:34,112 - pingus - INFO - Available LLM providers: openai, claude, gemini, huggingface
+2025-10-25 14:37:34,113 - pingus - INFO - Default provider: openai
+2025-10-25 14:37:34,114 - pingus - INFO - Startup complete!
+2025-10-25 14:37:34,114 - pingus - INFO - ============================================================
+2025-10-25 14:37:44,757 - pingus - INFO - CORS enabled for all origins
+2025-10-25 14:37:44,776 - pingus - INFO - ============================================================
+2025-10-25 14:37:44,776 - pingus - INFO - Starting BrainSightAI Chatbot v2.0.0
+2025-10-25 14:37:44,777 - pingus - INFO - Environment: production
+2025-10-25 14:37:44,777 - pingus - INFO - ============================================================
+2025-10-25 14:37:44,792 - pingus - INFO - Initializing vector store...
+2025-10-25 14:37:57,001 - pingus - INFO - Vector store ready with 55 documents
+2025-10-25 14:37:58,364 - pingus - INFO - Available LLM providers: openai, claude, gemini, huggingface
+2025-10-25 14:37:58,365 - pingus - INFO - Default provider: openai
+2025-10-25 14:37:58,366 - pingus - INFO - Startup complete!
+2025-10-25 14:37:58,366 - pingus - INFO - ============================================================
+2025-10-25 14:38:42,214 - pingus - INFO - Shutting down application...
+2025-10-25 14:42:56,895 - pingus - INFO - CORS enabled for all origins
+2025-10-25 14:42:56,906 - pingus - INFO - ============================================================
+2025-10-25 14:42:56,906 - pingus - INFO - Starting BrainSightAI Chatbot v2.0.0
+2025-10-25 14:42:56,906 - pingus - INFO - Environment: production
+2025-10-25 14:42:56,906 - pingus - INFO - ============================================================
+2025-10-25 14:42:56,964 - pingus - INFO - Initializing vector store...
+2025-10-25 14:43:10,649 - pingus - INFO - Vector store ready with 55 documents
+2025-10-25 14:43:11,275 - pingus - INFO - Available LLM providers: openai, claude, gemini, huggingface
+2025-10-25 14:43:11,328 - pingus - INFO - Default provider: openai
+2025-10-25 14:43:11,329 - pingus - INFO - Startup complete!
+2025-10-25 14:43:11,335 - pingus - INFO - ============================================================
+2025-10-25 14:43:31,189 - pingus - INFO - GET /health
+2025-10-25 14:43:31,191 - pingus - INFO - Response: 200
+2025-10-25 14:43:33,247 - pingus - INFO - GET /api/config/
+2025-10-25 14:43:33,253 - pingus - INFO - Response: 200
+2025-10-25 14:43:35,277 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:43:35,279 - pingus - INFO - Response: 200
+2025-10-25 14:43:37,341 - pingus - INFO - POST /api/config/provider/openai
+2025-10-25 14:43:37,342 - pingus - INFO - Response: 200
+2025-10-25 14:43:39,457 - pingus - INFO - GET /health
+2025-10-25 14:43:39,461 - pingus - INFO - Response: 200
+2025-10-25 14:43:41,519 - pingus - INFO - GET /api/config/
+2025-10-25 14:43:41,521 - pingus - INFO - Response: 200
+2025-10-25 14:43:43,562 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:43:43,602 - pingus - INFO - Response: 200
+2025-10-25 14:43:45,671 - pingus - INFO - GET /api/documents/
+2025-10-25 14:43:45,753 - pingus - INFO - Response: 200
+2025-10-25 14:43:47,822 - pingus - INFO - GET /api/documents/
+2025-10-25 14:43:47,873 - pingus - INFO - Response: 200
+2025-10-25 14:43:49,938 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:43:49,940 - pingus - INFO - Response: 200
+2025-10-25 14:43:51,999 - pingus - INFO - GET /api/config/
+2025-10-25 14:43:52,001 - pingus - INFO - Response: 200
+2025-10-25 14:43:57,386 - pingus - INFO - GET /health
+2025-10-25 14:43:57,572 - pingus - INFO - Response: 200
+2025-10-25 14:44:01,225 - pingus - INFO - GET /api/config/
+2025-10-25 14:44:01,226 - pingus - INFO - Response: 200
+2025-10-25 14:44:03,267 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:44:03,269 - pingus - INFO - Response: 200
+2025-10-25 14:44:05,328 - pingus - INFO - GET /api/documents/
+2025-10-25 14:44:05,567 - pingus - INFO - Response: 200
+2025-10-25 14:44:07,627 - pingus - INFO - POST /api/chat/
+2025-10-25 14:44:23,593 - pingus - INFO - Response: 200
+2025-10-25 14:44:25,663 - pingus - INFO - GET /health
+2025-10-25 14:44:25,666 - pingus - INFO - Response: 200
+2025-10-25 14:44:27,719 - pingus - INFO - GET /api/config/
+2025-10-25 14:44:27,721 - pingus - INFO - Response: 200
+2025-10-25 14:44:29,782 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:44:29,786 - pingus - INFO - Response: 200
+2025-10-25 14:44:31,824 - pingus - INFO - GET /api/documents/
+2025-10-25 14:44:31,915 - pingus - INFO - Response: 200
+2025-10-25 14:44:33,945 - pingus - INFO - GET /api/documents/
+2025-10-25 14:44:34,004 - pingus - INFO - Response: 200
+2025-10-25 14:44:36,059 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:44:36,061 - pingus - INFO - Response: 200
+2025-10-25 14:44:38,129 - pingus - INFO - GET /api/config/
+2025-10-25 14:44:38,132 - pingus - INFO - Response: 200
+2025-10-25 14:48:42,017 - pingus - INFO - GET /health
+2025-10-25 14:48:42,027 - pingus - INFO - Response: 200
+2025-10-25 14:48:44,082 - pingus - INFO - GET /api/config/
+2025-10-25 14:48:44,086 - pingus - INFO - Response: 200
+2025-10-25 14:48:46,126 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:48:46,129 - pingus - INFO - Response: 200
+2025-10-25 14:48:48,200 - pingus - INFO - GET /api/documents/
+2025-10-25 14:48:48,342 - pingus - INFO - Response: 200
+2025-10-25 14:48:50,491 - pingus - INFO - POST /api/feedback/submit
+2025-10-25 14:48:50,558 - pingus - INFO - Response: 200
+2025-10-25 14:48:52,628 - pingus - INFO - GET /health
+2025-10-25 14:48:52,630 - pingus - INFO - Response: 200
+2025-10-25 14:48:54,669 - pingus - INFO - GET /api/config/
+2025-10-25 14:48:54,672 - pingus - INFO - Response: 200
+2025-10-25 14:48:56,722 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:48:56,724 - pingus - INFO - Response: 200
+2025-10-25 14:48:58,792 - pingus - INFO - GET /api/documents/
+2025-10-25 14:48:58,856 - pingus - INFO - Response: 200
+2025-10-25 14:49:00,923 - pingus - INFO - GET /api/documents/
+2025-10-25 14:49:00,990 - pingus - INFO - Response: 200
+2025-10-25 14:49:03,051 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:49:03,054 - pingus - INFO - Response: 200
+2025-10-25 14:49:05,099 - pingus - INFO - GET /api/config/
+2025-10-25 14:49:05,102 - pingus - INFO - Response: 200
+2025-10-25 14:49:17,389 - pingus - INFO - GET /health
+2025-10-25 14:49:17,392 - pingus - INFO - Response: 200
+2025-10-25 14:49:19,423 - pingus - INFO - GET /api/config/
+2025-10-25 14:49:19,426 - pingus - INFO - Response: 200
+2025-10-25 14:49:21,482 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:49:21,484 - pingus - INFO - Response: 200
+2025-10-25 14:49:23,552 - pingus - INFO - GET /api/documents/
+2025-10-25 14:49:23,619 - pingus - INFO - Response: 200
+2025-10-25 14:49:25,712 - pingus - INFO - POST /api/chat/
+2025-10-25 14:49:40,179 - pingus - INFO - Response: 200
+2025-10-25 14:49:42,255 - pingus - INFO - GET /health
+2025-10-25 14:49:42,257 - pingus - INFO - Response: 200
+2025-10-25 14:49:44,310 - pingus - INFO - GET /api/config/
+2025-10-25 14:49:44,312 - pingus - INFO - Response: 200
+2025-10-25 14:49:46,350 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:49:46,354 - pingus - INFO - Response: 200
+2025-10-25 14:49:48,417 - pingus - INFO - GET /api/documents/
+2025-10-25 14:49:48,522 - pingus - INFO - Response: 200
+2025-10-25 14:49:50,581 - pingus - INFO - GET /api/documents/
+2025-10-25 14:49:50,624 - pingus - INFO - Response: 200
+2025-10-25 14:49:52,670 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:49:52,672 - pingus - INFO - Response: 200
+2025-10-25 14:49:53,012 - pingus - INFO - GET /health
+2025-10-25 14:49:53,014 - pingus - INFO - Response: 200
+2025-10-25 14:49:55,061 - pingus - INFO - GET /api/config/
+2025-10-25 14:49:55,063 - pingus - INFO - Response: 200
+2025-10-25 14:49:57,116 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:49:57,119 - pingus - INFO - Response: 200
+2025-10-25 14:49:59,172 - pingus - INFO - GET /api/documents/
+2025-10-25 14:49:59,231 - pingus - INFO - Response: 200
+2025-10-25 14:50:01,270 - pingus - INFO - GET /api/documents/
+2025-10-25 14:50:01,340 - pingus - INFO - Response: 200
+2025-10-25 14:50:03,404 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:50:03,406 - pingus - INFO - Response: 200
+2025-10-25 14:50:05,452 - pingus - INFO - GET /api/config/
+2025-10-25 14:50:05,499 - pingus - INFO - Response: 200
+2025-10-25 14:50:07,703 - pingus - INFO - GET /health
+2025-10-25 14:50:07,705 - pingus - INFO - Response: 200
+2025-10-25 14:50:09,760 - pingus - INFO - GET /api/config/
+2025-10-25 14:50:09,762 - pingus - INFO - Response: 200
+2025-10-25 14:50:11,812 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:50:11,814 - pingus - INFO - Response: 200
+2025-10-25 14:50:13,867 - pingus - INFO - GET /api/documents/
+2025-10-25 14:50:13,923 - pingus - INFO - Response: 200
+2025-10-25 14:50:16,005 - pingus - INFO - POST /api/feedback/submit
+2025-10-25 14:50:16,030 - pingus - INFO - Response: 200
+2025-10-25 14:50:18,111 - pingus - INFO - GET /health
+2025-10-25 14:50:18,114 - pingus - INFO - Response: 200
+2025-10-25 14:50:20,156 - pingus - INFO - GET /api/config/
+2025-10-25 14:50:20,159 - pingus - INFO - Response: 200
+2025-10-25 14:50:22,220 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:50:22,223 - pingus - INFO - Response: 200
+2025-10-25 14:50:24,275 - pingus - INFO - GET /api/documents/
+2025-10-25 14:50:24,442 - pingus - INFO - Response: 200
+2025-10-25 14:50:26,491 - pingus - INFO - GET /api/documents/
+2025-10-25 14:50:26,557 - pingus - INFO - Response: 200
+2025-10-25 14:50:28,587 - pingus - INFO - GET /api/config/providers
+2025-10-25 14:50:28,588 - pingus - INFO - Response: 200
+2025-10-25 14:50:30,624 - pingus - INFO - GET /api/config/
+2025-10-25 14:50:30,626 - pingus - INFO - Response: 200
+2025-10-25 14:50:53,789 - pingus - INFO - Shutting down application...

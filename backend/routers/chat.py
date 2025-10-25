@@ -1,6 +1,5 @@
 """
-Chat API endpoints - WINDOWS COMPATIBLE VERSION
-No emoji characters that cause encoding errors on Windows
+Chat API endpoints - FIXED DATABASE SAVE VERSION
 """
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from fastapi.responses import StreamingResponse
@@ -51,6 +50,92 @@ class ChatResponse(BaseModel):
     message_id: str
 
 
+def save_to_database(db: Session, user_id: str, session_id: str, message_id: str,
+                     question: str, response: str, provider: str, tokens: Optional[int]):
+    """
+    Separate function to save to database with proper error handling
+    Returns: True if successful, False otherwise
+    """
+    try:
+        logger.info("\n" + "=" * 80)
+        logger.info("[DB_SAVE] Starting database save operation")
+        logger.info("=" * 80)
+        
+        # Log all parameters
+        logger.info(f"[DB_SAVE] user_id: {user_id}")
+        logger.info(f"[DB_SAVE] session_id: {session_id}")
+        logger.info(f"[DB_SAVE] message_id: {message_id}")
+        logger.info(f"[DB_SAVE] question length: {len(question)}")
+        logger.info(f"[DB_SAVE] response length: {len(response)}")
+        logger.info(f"[DB_SAVE] provider: {provider}")
+        logger.info(f"[DB_SAVE] tokens: {tokens}")
+        
+        # Create interaction object
+        interaction = FeedbackInteraction(
+            user_id=user_id,
+            session_id=session_id,
+            message_id=message_id,
+            question=question,
+            response=response,
+            provider_used=provider,
+            tokens_used=tokens
+        )
+        
+        logger.info(f"[DB_SAVE] Created FeedbackInteraction object with id: {interaction.id}")
+        
+        # Add to session
+        db.add(interaction)
+        logger.info("[DB_SAVE] Added to session")
+        
+        # Flush to check for errors
+        db.flush()
+        logger.info("[DB_SAVE] Flushed successfully")
+        
+        # Commit
+        db.commit()
+        logger.info("[DB_SAVE] COMMIT SUCCESSFUL!")
+        
+        # Refresh to get updated data
+        db.refresh(interaction)
+        logger.info(f"[DB_SAVE] Refreshed - Final DB ID: {interaction.id}")
+        
+        # Verify save
+        verify = db.query(FeedbackInteraction).filter(
+            FeedbackInteraction.message_id == message_id
+        ).first()
+        
+        if verify:
+            logger.info("[DB_SAVE] ✅✅✅ VERIFICATION SUCCESSFUL!")
+            logger.info(f"[DB_SAVE] Found in DB with ID: {verify.id}")
+            logger.info(f"[DB_SAVE] User: {verify.user_id}")
+            logger.info(f"[DB_SAVE] Question: {verify.question[:50]}...")
+            logger.info("=" * 80 + "\n")
+            return True
+        else:
+            logger.error("[DB_SAVE] ❌ VERIFICATION FAILED - Record not found!")
+            logger.error("=" * 80 + "\n")
+            return False
+            
+    except Exception as e:
+        logger.error("\n" + "=" * 80)
+        logger.error("[DB_SAVE] ❌❌❌ DATABASE SAVE FAILED!")
+        logger.error("=" * 80)
+        logger.error(f"[DB_SAVE] Error type: {type(e).__name__}")
+        logger.error(f"[DB_SAVE] Error message: {str(e)}")
+        logger.error("[DB_SAVE] Full traceback:")
+        logger.error(traceback.format_exc())
+        logger.error("=" * 80 + "\n")
+        
+        # Rollback on error
+        try:
+            db.rollback()
+            logger.info("[DB_SAVE] Rollback completed")
+        except Exception as rollback_error:
+            logger.error(f"[DB_SAVE] Rollback failed: {rollback_error}")
+        
+        return False
+
+
 @router.post("/", response_model=ChatResponse)
 async def chat(
     request: ChatRequest, 
@@ -61,14 +146,12 @@ async def chat(
     Send a message and get a response with RAG
     """
     
-    # Log EVERYTHING (no emojis for Windows compatibility)
     logger.info("\n" + "=" * 80)
-    logger.info("NEW CHAT REQUEST RECEIVED")
+    logger.info("NEW CHAT REQUEST")
     logger.info("=" * 80)
-    logger.info(f"[MESSAGE] {request.message[:100]}...")
-    logger.info(f"[USER_ID] Request: {request.user_id}")
-    logger.info(f"[SESSION_ID] Request: {request.session_id}")
-    logger.info(f"[PROVIDER] Requested: {request.provider}")
+    logger.info(f"[REQUEST] Message: {request.message[:100]}...")
+    logger.info(f"[REQUEST] User ID from request: {request.user_id}")
+    logger.info(f"[REQUEST] Session ID from request: {request.session_id}")
     
     try:
         # Validate input
@@ -76,18 +159,17 @@ async def chat(
             message=request.message,
             session_id=request.session_id
         )
-        logger.info("[OK] Input validation passed")
         
         # Get or create session ID and user ID
         session_id = request.session_id or f"session_{uuid.uuid4().hex[:12]}"
         user_id = request.user_id or "anonymous"
         
-        logger.info(f"[USER] Using user_id: {user_id}")
-        logger.info(f"[SESSION] Using session_id: {session_id}")
+        logger.info(f"[SESSION] Final user_id: {user_id}")
+        logger.info(f"[SESSION] Final session_id: {session_id}")
         
         # Generate unique message ID
         message_id = f"msg_{uuid.uuid4().hex[:12]}"
-        logger.info(f"[MSG_ID] Generated: {message_id}")
+        logger.info(f"[SESSION] Generated message_id: {message_id}")
         
         # Initialize session if needed
         if session_id not in conversations:
@@ -96,15 +178,11 @@ async def chat(
                 "history": [],
                 "message_count": 0
             }
-            logger.info("[SESSION] Created new conversation")
         
         # Get LLM factory
-        logger.info("[LLM] Getting factory...")
         factory = get_llm_factory()
-        logger.info("[LLM] Factory ready")
         
         # Retrieve relevant context from vector DB
-        logger.info("[VECTOR_DB] Retrieving context...")
         retriever = DocumentRetriever()
         context_data = retriever.retrieve_context(request.message)
         logger.info(f"[VECTOR_DB] Retrieved {len(context_data['sources'])} sources")
@@ -112,11 +190,10 @@ async def chat(
         # Build messages for LLM
         messages = []
         
-        # Add conversation history
+        # Add conversation history (last 6 messages)
         if request.conversation_history:
             for msg in request.conversation_history[-6:]:
                 messages.append(Message(role=msg.role, content=msg.content))
-            logger.info(f"[HISTORY] Added {len(messages)} messages")
         
         # Add current query with context
         user_prompt = f"""Context information:
@@ -129,7 +206,6 @@ Question: {request.message}
 Answer:"""
         
         messages.append(Message(role="user", content=user_prompt))
-        logger.info(f"[PROMPT] Built with {len(messages)} total messages")
         
         # Get system prompt
         system_prompt = get_config().system_prompt
@@ -146,100 +222,24 @@ Answer:"""
         logger.info(f"[LLM] Tokens: {llm_response.tokens_used}")
         
         # ===================================================================
-        # CRITICAL SECTION: DATABASE SAVE
+        # CRITICAL: SAVE TO DATABASE - SIMPLIFIED AND FIXED
         # ===================================================================
-        logger.info("\n" + "=" * 80)
-        logger.info("DATABASE SAVE STARTING")
-        logger.info("=" * 80)
         
-        try:
-            logger.info("[DB] Save parameters:")
-            logger.info(f"[DB]   user_id: {user_id}")
-            logger.info(f"[DB]   session_id: {session_id}")
-            logger.info(f"[DB]   message_id: {message_id}")
-            logger.info(f"[DB]   question length: {len(request.message)} chars")
-            logger.info(f"[DB]   response length: {len(llm_response.content)} chars")
-            logger.info(f"[DB]   provider: {llm_response.provider}")
-            logger.info(f"[DB]   tokens: {llm_response.tokens_used}")
-            
-            # Check database session
-            logger.info(f"[DB] Session object: {db}")
-            logger.info(f"[DB] Session type: {type(db)}")
-            logger.info(f"[DB] Session active: {db.is_active}")
-            
-            # Create interaction object
-            logger.info("[DB] Creating FeedbackInteraction object...")
-            interaction = FeedbackInteraction(
-                user_id=user_id,
-                session_id=session_id,
-                message_id=message_id,
-                question=request.message,
-                response=llm_response.content,
-                provider_used=llm_response.provider,
-                tokens_used=llm_response.tokens_used
-            )
-            logger.info("[DB] [OK] FeedbackInteraction object created")
-            logger.info(f"[DB]   Object id: {interaction.id}")
-            logger.info(f"[DB]   Object user_id: {interaction.user_id}")
-            logger.info(f"[DB]   Object message_id: {interaction.message_id}")
-            
-            # Add to session
-            logger.info("[DB] Adding to database session...")
-            db.add(interaction)
-            logger.info("[DB] [OK] Added to session")
-            
-            # Flush to check for errors before commit
-            logger.info("[DB] Flushing session...")
-            db.flush()
-            logger.info("[DB] [OK] Flushed successfully")
-            
-            # Commit
-            logger.info("[DB] Committing transaction...")
-            db.commit()
-            logger.info("[DB] [OK] COMMIT SUCCESSFUL!")
-            
-            # Refresh
-            logger.info("[DB] Refreshing object...")
-            db.refresh(interaction)
-            logger.info(f"[DB] [OK] Refreshed - Final DB ID: {interaction.id}")
-            
-            # VERIFICATION - Check if really saved
-            logger.info("[DB] VERIFYING save in database...")
-            verify_interaction = db.query(FeedbackInteraction).filter(
-                FeedbackInteraction.message_id == message_id
-            ).first()
-            
-            if verify_interaction:
-                logger.info("[DB] [SUCCESS] VERIFICATION PASSED!")
-                logger.info(f"[DB]   Found in DB with ID: {verify_interaction.id}")
-                logger.info(f"[DB]   User: {verify_interaction.user_id}")
-                logger.info(f"[DB]   Question: {verify_interaction.question[:50]}...")
-                logger.info("=" * 80)
-                logger.info("[DB] DATABASE SAVE COMPLETELY SUCCESSFUL!")
-                logger.info("=" * 80 + "\n")
-            else:
-                logger.error("[DB] [ERROR] VERIFICATION FAILED!")
-                logger.error(f"[DB]   Message {message_id} NOT FOUND in database!")
-                logger.error("[DB]   This should be impossible after successful commit!")
-                logger.error("=" * 80 + "\n")
-                
-        except Exception as db_error:
-            logger.error("\n" + "=" * 80)
-            logger.error("[DB] [ERROR] DATABASE SAVE FAILED!")
-            logger.error("=" * 80)
-            logger.error(f"[DB] Error type: {type(db_error).__name__}")
-            logger.error(f"[DB] Error message: {str(db_error)}")
-            logger.error("[DB] Full traceback:")
-            logger.error(traceback.format_exc())
-            logger.error("=" * 80 + "\n")
-            
-            # Rollback
-            logger.error("[DB] Rolling back transaction...")
-            db.rollback()
-            logger.error("[DB] Rollback complete")
-            
-            # DO NOT fail the request - just log the error
-            logger.error("[DB] [WARNING] Continuing to return response despite save failure")
+        save_success = save_to_database(
+            db=db,
+            user_id=user_id,
+            session_id=session_id,
+            message_id=message_id,
+            question=request.message,
+            response=llm_response.content,
+            provider=llm_response.provider,
+            tokens=llm_response.tokens_used
+        )
+        
+        if save_success:
+            logger.info("[RESPONSE] ✅ Database save confirmed successful")
+        else:
+            logger.error("[RESPONSE] ❌ Database save failed but continuing with response")
         
         # Store in conversation history
         conversations[session_id]["history"].extend([
@@ -258,7 +258,6 @@ Answer:"""
             }
         ])
         conversations[session_id]["message_count"] += 1
-        logger.info("[MEMORY] Saved to in-memory conversation history")
         
         # Cleanup old sessions in background
         background_tasks.add_task(cleanup_old_sessions)
