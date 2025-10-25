@@ -14,7 +14,11 @@ DB_PATH = DB_DIR / "feedback.db"
 
 # Create engine
 DATABASE_URL = f"sqlite:///{DB_PATH}"
-engine = create_engine(DATABASE_URL, echo=False)
+engine = create_engine(
+    DATABASE_URL, 
+    echo=False,
+    connect_args={"check_same_thread": False}  # Important for SQLite with FastAPI
+)
 
 # Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -28,8 +32,8 @@ def init_db():
         logger.error(f"Database initialization error: {e}")
         raise
 
-def get_db() -> Session:
-    """Get database session"""
+def get_db():
+    """Get database session - FastAPI Dependency"""
     db = SessionLocal()
     try:
         yield db

@@ -1,5 +1,5 @@
 """
-Chat API endpoints - UPDATED with feedback storage
+Chat API endpoints - COMPLETE FIXED VERSION
 """
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from fastapi.responses import StreamingResponse
@@ -32,7 +32,7 @@ class ChatRequest(BaseModel):
     conversation_history: Optional[List[ChatMessage]] = []
     session_id: Optional[str] = None
     provider: Optional[str] = None
-    user_id: Optional[str] = None  # NEW: User identification
+    user_id: Optional[str] = None
 
 class Source(BaseModel):
     title: str
@@ -46,7 +46,7 @@ class ChatResponse(BaseModel):
     success: bool
     provider_used: str
     tokens_used: Optional[int] = None
-    message_id: str  # NEW: Return message_id for feedback
+    message_id: str
 
 @router.post("/", response_model=ChatResponse)
 async def chat(
@@ -66,9 +66,11 @@ async def chat(
         
         logger.info(f"Chat request: {request.message[:100]}...")
         
-        # Get or create session ID
+        # Get or create session ID and user ID
         session_id = request.session_id or f"session_{uuid.uuid4().hex[:12]}"
-        user_id = request.user_id or "anonymous"  # NEW: Get user_id or default
+        user_id = request.user_id or "anonymous"
+        
+        logger.info(f"📝 Session: {session_id}, User: {user_id}")
         
         # Initialize session if needed
         if session_id not in conversations:
@@ -118,9 +120,17 @@ Answer:"""
         # Generate unique message ID
         message_id = f"msg_{uuid.uuid4().hex[:12]}"
         
-        # Store interaction in database
+        # Store interaction in database - WITH DEBUG LOGGING
+        logger.info(f"🔍 Attempting to save interaction to database...")
+        logger.info(f"   Message ID: {message_id}")
+        logger.info(f"   User ID: {user_id}")
+        logger.info(f"   Session ID: {session_id}")
+        logger.info(f"   Database session: {db}")
+        
         try:
+            # Create interaction object
             interaction = FeedbackInteraction(
+                user_id=user_id,
                 session_id=session_id,
                 message_id=message_id,
                 question=request.message,
@@ -128,12 +138,39 @@ Answer:"""
                 provider_used=llm_response.provider,
                 tokens_used=llm_response.tokens_used
             )
+            
+            logger.info(f"   ✅ Created FeedbackInteraction object")
+            
+            # Add to session
             db.add(interaction)
+            logger.info(f"   ✅ Added to database session")
+            
+            # Commit
             db.commit()
-            logger.info(f"Stored interaction: {message_id}")
+            logger.info(f"   ✅ Committed to database")
+            
+            # Refresh to get the ID
+            db.refresh(interaction)
+            logger.info(f"   ✅ Refreshed object - DB ID: {interaction.id}")
+            
+            # Verify it's actually in the database
+            from database.connection import SessionLocal
+            verify_db = SessionLocal()
+            check = verify_db.query(FeedbackInteraction).filter(
+                FeedbackInteraction.message_id == message_id
+            ).first()
+            verify_db.close()
+            
+            if check:
+                logger.info(f"✅✅✅ VERIFIED: Interaction {message_id} found in database!")
+            else:
+                logger.error(f"❌❌❌ WARNING: Interaction {message_id} NOT found after commit!")
+            
         except Exception as e:
-            logger.error(f"Failed to store interaction: {e}")
+            logger.error(f"❌ Failed to store interaction: {e}", exc_info=True)
             db.rollback()
+            logger.error(f"   Database rolled back")
+            # Continue anyway - don't fail the chat request
         
         # Store in conversation history
         conversations[session_id]["history"].extend([
@@ -163,11 +200,11 @@ Answer:"""
             success=llm_response.finish_reason != "error",
             provider_used=llm_response.provider,
             tokens_used=llm_response.tokens_used,
-            message_id=message_id  # NEW: Include message_id
+            message_id=message_id
         )
         
     except Exception as e:
-        logger.error(f"Chat error: {e}")
+        logger.error(f"Chat error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/stream")

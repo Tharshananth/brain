@@ -132,7 +132,8 @@ def send_message(message, provider=None):
                 for msg in st.session_state.messages[-10:]
             ],
             "session_id": st.session_state.session_id,
-            "provider": provider
+            "provider": provider,
+            "user_id": st.session_state.user_id
         }
         
         response = requests.post(

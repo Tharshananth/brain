@@ -1,0 +1,2 @@
+ID,User_ID,Session_ID,Message_ID,Timestamp,Question,Response,Provider_Used,Tokens_Used,Feedback_Type,Feedback_Comment,Feedback_Timestamp
+65857df3-694e-46d3-a159-7f9c1c272ac2,test_user,test_session,test_msg_183f7c33,2025-10-25 03:42:44.598719,This is a test question,This is a test response,test_provider,100,,,
