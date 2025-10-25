@@ -2,6 +2,22 @@
 PingUs RAG Chatbot - Main Application
 Production-ready FastAPI application with multi-model LLM support
 """
+"""
+Quick fix for Windows console encoding issues
+Add this to the TOP of your main.py file
+"""
+
+# Fix Windows console encoding for emojis
+import sys
+import io
+
+# Force UTF-8 encoding for stdout/stderr
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
+# Rest of your main.py imports continue below...
+
 import os
 import sys
 from pathlib import Path
